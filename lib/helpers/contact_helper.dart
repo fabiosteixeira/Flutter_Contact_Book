@@ -27,7 +27,7 @@ class ContactHelper {
 
   Future<Database> initDb() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, "contacts.db");
+    final path = join(databasesPath, "contacts_oficial.db");
 
     return openDatabase(path, version: 1,
         onCreate: (Database db, int newerVersion) async {
@@ -51,7 +51,7 @@ class ContactHelper {
         columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
         where: "$idColumn = ?",
         whereArgs: [id]);
-    if (maps.length > 0) {
+    if (maps.isNotEmpty) {
       return Contact.fromMap(maps.first);
     } else {
       return null;
@@ -77,7 +77,7 @@ class ContactHelper {
     );
   }
 
-  Future<List> getAllContacts() async {
+  Future<List<Contact>> getAllContacts() async {
     Database? dbContact = await db;
     List listMap = await dbContact!.rawQuery("SELECT * FROM $contactTable");
     List<Contact> listContact = [];
@@ -105,6 +105,8 @@ class Contact {
   String? email;
   String? phone;
   String? img;
+
+  Contact();
 
   Contact.fromMap(Map map) {
     id = map[idColumn];
