@@ -2,6 +2,7 @@ import 'dart:io';
 
 import "package:flutter/material.dart";
 import '../helpers/contact_helper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ContactPage extends StatefulWidget {
   final Contact? contact;
@@ -76,6 +77,18 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                   ),
                 ),
+                onTap: () {
+                  ImagePicker()
+                      .pickImage(source: ImageSource.camera)
+                      .then((file) {
+                    if (file == null) {
+                      return;
+                    }
+                    setState(() {
+                      _editedContact!.img = file.path;
+                    });
+                  });
+                },
               ),
               TextField(
                 decoration: const InputDecoration(labelText: "Nome"),
@@ -133,7 +146,7 @@ class _ContactPageState extends State<ContactPage> {
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
-                  child: Text("Sim"),
+                  child: const Text("Sim"),
                 ),
               ],
             );
