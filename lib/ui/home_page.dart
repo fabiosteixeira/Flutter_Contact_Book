@@ -56,17 +56,35 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      image: contacts[index].img != null
-                          ? FileImage(File(contacts[index].img!))
-                          : const AssetImage("images/person.jpg")
-                              as ImageProvider),
-                ),
+              FutureBuilder(
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      final img = snapshot.data as ImageProvider<Object>;
+                      return Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: img,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return const SizedBox(
+                        width: 80,
+                        height: 80,
+                      );
+                    }
+                  } else {
+                    return const SizedBox(
+                      width: 80,
+                      height: 80,
+                    );
+                  }
+                },
+                future: getContactImage(contacts[index].img),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -100,5 +118,19 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<ImageProvider<Object>> getContactImage(String? path) async {
+    if (path != null) {
+      FileImage img = FileImage(File(path));
+      try {
+        await img.file.readAsBytes();
+        return FileImage(File(path));
+      } catch (e) {
+        return const AssetImage("images/person.jpg");
+      }
+    } else {
+      return const AssetImage("images/person.jpg");
+    }
   }
 }
